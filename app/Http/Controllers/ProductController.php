@@ -13,7 +13,15 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
-        return response()->json($products);
+        return view('products.index', compact('products')); // Return the index blade with all products
+    }
+
+    /**
+     * Show the form for creating a new product.
+     */
+    public function create()
+    {
+        return view('products.create'); // Return the create blade
     }
 
     /**
@@ -30,8 +38,8 @@ class ProductController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
         ]);
 
-        $product = Product::create($validated);
-        return response()->json($product, 201);
+        Product::create($validated);
+        return redirect()->route('products.index')->with('success', 'Product created successfully!'); // Redirect to index with success message
     }
 
     /**
@@ -39,7 +47,15 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return response()->json($product);
+        return view('products.show', compact('product')); // Return a show blade (if needed)
+    }
+
+    /**
+     * Show the form for editing the specified product.
+     */
+    public function edit(Product $product)
+    {
+        return view('products.edit', compact('product')); // Return the edit blade with the product data
     }
 
     /**
@@ -57,7 +73,7 @@ class ProductController extends Controller
         ]);
 
         $product->update($validated);
-        return response()->json($product);
+        return redirect()->route('products.index')->with('success', 'Product updated successfully!'); // Redirect to index with success message
     }
 
     /**
@@ -66,6 +82,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return response()->json(null, 204);
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully!'); // Redirect to index with success message
     }
 }

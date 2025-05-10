@@ -13,7 +13,7 @@ class PurchaseOrderController extends Controller
     public function index()
     {
         $purchaseOrders = PurchaseOrder::with('supplier')->get();
-        return response()->json($purchaseOrders);
+        return view('purchase-orders.index', compact('purchaseOrders')); // Return the index blade with all purchase orders
     }
 
     /**
@@ -27,8 +27,8 @@ class PurchaseOrderController extends Controller
             'total_amount' => 'required|numeric|min:0',
         ]);
 
-        $purchaseOrder = PurchaseOrder::create($validated);
-        return response()->json($purchaseOrder, 201);
+        PurchaseOrder::create($validated);
+        return redirect()->route('purchase-orders.index')->with('success', 'Purchase order created successfully!'); // Redirect to index with success message
     }
 
     /**
@@ -37,7 +37,7 @@ class PurchaseOrderController extends Controller
     public function show(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->load('supplier');
-        return response()->json($purchaseOrder);
+        return view('purchase-orders.show', compact('purchaseOrder')); // Return the show blade with the purchase order details
     }
 
     /**
@@ -52,7 +52,7 @@ class PurchaseOrderController extends Controller
         ]);
 
         $purchaseOrder->update($validated);
-        return response()->json($purchaseOrder);
+        return redirect()->route('purchase-orders.index')->with('success', 'Purchase order updated successfully!'); // Redirect to index with success message
     }
 
     /**
@@ -61,6 +61,6 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->delete();
-        return response()->json(null, 204);
+        return redirect()->route('purchase-orders.index')->with('success', 'Purchase order deleted successfully!'); // Redirect to index with success message
     }
 }

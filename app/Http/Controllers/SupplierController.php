@@ -13,7 +13,15 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = Supplier::all();
-        return response()->json($suppliers);
+        return view('suppliers.index', compact('suppliers')); // Return the index blade with all suppliers
+    }
+
+    /**
+     * Show the form for creating a new supplier.
+     */
+    public function create()
+    {
+        return view('suppliers.create'); // Return the create blade
     }
 
     /**
@@ -27,16 +35,16 @@ class SupplierController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        $supplier = Supplier::create($validated);
-        return response()->json($supplier, 201);
+        Supplier::create($validated);
+        return redirect()->route('suppliers.index')->with('success', 'Supplier created successfully!');
     }
 
     /**
-     * Display the specified supplier.
+     * Show the form for editing the specified supplier.
      */
-    public function show(Supplier $supplier)
+    public function edit(Supplier $supplier)
     {
-        return response()->json($supplier);
+        return view('suppliers.edit', compact('supplier')); // Return the edit blade with the supplier data
     }
 
     /**
@@ -51,7 +59,7 @@ class SupplierController extends Controller
         ]);
 
         $supplier->update($validated);
-        return response()->json($supplier);
+        return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully!');
     }
 
     /**
@@ -60,6 +68,6 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier)
     {
         $supplier->delete();
-        return response()->json(null, 204);
+        return redirect()->route('suppliers.index')->with('success', 'Supplier deleted successfully!');
     }
 }
