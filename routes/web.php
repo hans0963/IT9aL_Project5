@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\InventoryTransactionController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,6 +20,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -26,6 +28,7 @@ Route::middleware('auth')->group(function () {
 
     // Product routes
     Route::resource('products', ProductController::class);
+    Route::get('/get-product-by-barcode', [ProductController::class, 'getProductByBarcode']); // Renamed route for barcode lookup
 
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
@@ -44,6 +47,8 @@ Route::middleware('auth')->group(function () {
 
     // PurchaseOrder routes
     Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::get('/purchase-orders/{purchaseOrder}/receipt', [PurchaseOrderController::class, 'receipt'])->name('purchase-orders.receipt');
+    Route::post('/purchase-orders/store', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
 
     // OrderDetail routes
     Route::prefix('order-details')->group(function () {
@@ -62,6 +67,16 @@ Route::middleware('auth')->group(function () {
         Route::put('/{inventoryTransaction}', [InventoryTransactionController::class, 'update'])->name('inventory-transactions.update');
         Route::delete('/{inventoryTransaction}', [InventoryTransactionController::class, 'destroy'])->name('inventory-transactions.destroy');
     });
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/qr-scanner', function () {
+        return Inertia::render('QRScanner', [
+            'auth' => [
+                'user' => auth()->user()
+            ]
+        ]);
+    })->name('qr-scanner');
 });
 
 require __DIR__.'/auth.php';
